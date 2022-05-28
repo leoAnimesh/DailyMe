@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import Routes from './src/screens/Routes';
 import React from 'react';

@@ -3,7 +3,7 @@ import { hp } from './GlobalTheme';
 
 export const GlobalStyles = StyleSheet.create({
   container: {
-    paddingTop: hp(8),
+    paddingTop: hp(6),
     flex: 1,
   },
 });

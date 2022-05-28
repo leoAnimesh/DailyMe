@@ -1,29 +1,18 @@
-import { View, Text,TouchableOpacity } from 'react-native';
-import React from 'react';
-import { GlobalStyles } from '../../constants/GlobalStyles';
-import { useDispatch } from 'react-redux';
-import { clearUser } from '../../redux/userSlice';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase/config';
-import { StatusBar } from '../../components';
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import DashBoard from '../DashBoard/DashBoard';
+import CustomDrawer from './CustomDrawer';
+import Projects from '../Projects/Projects';
+import Tasks from '../Tasks/Tasks';
+
+const Drawer = createDrawerNavigator();
 
 const Home = () => {
-  const dispatch = useDispatch();
-  const handleSignOut = () => {
-    signOut(auth).then(() => {
-      dispatch(clearUser());
-    }).catch((error) => {
-      console.log(error.message);
-    });
-  }
   return (
-    <View style={GlobalStyles.container}>
-      <StatusBar/>
-      <Text>Home</Text>
-      <TouchableOpacity onPress={handleSignOut} >
-        <Text>SignOut</Text>
-      </TouchableOpacity>
-    </View>
+    <Drawer.Navigator screenOptions={{headerShown:false}}  drawerContent={(props)=> <CustomDrawer {...props} />} >
+      <Drawer.Screen name="dashboard" component={DashBoard} />
+      <Drawer.Screen name="Projects" component={Projects} />
+      <Drawer.Screen name="Tasks" component={Tasks} />
+    </Drawer.Navigator>
   );
 };
 
