@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, ActivityIndicator } from 'react-native';
 import React from 'react';
 import styles from './SignUpStyles';
 import { GlobalStyles } from '../../constants/GlobalStyles';
@@ -9,6 +9,11 @@ import { COLOR } from '../../constants/GlobalTheme';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import { auth,db } from '../../firebase/config';
+import {createUserWithEmailAndPassword} from 'firebase/auth'
+import {setDoc,doc, Timestamp} from 'firebase/firestore'
+import {useDispatch} from 'react-redux';
+import {setAuth} from '../../redux/userSlice';
 
 const signUpSchema = yup.object({
   name: yup.string().min(3).required(),
@@ -17,7 +22,35 @@ const signUpSchema = yup.object({
 });
 
 const SignUp = () => {
+  const [loading,setLoading] = React.useState(false);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const signUpUser = (user) => {
+    setLoading(true);
+    createUserWithEmailAndPassword(auth,user.email,user.password)
+    .then((credentials)=>{
+      if(credentials){
+        const userDocRef = doc(db,'user',credentials.user.uid) 
+        setDoc(userDocRef,{
+          name : user.name,
+          email : user.email,
+          createdAt : Timestamp.now(),
+        }).then(()=>{
+          dispatch(setAuth({id: credentials.user.uid,name:user.name,email:user.email}))
+          setLoading(false)
+        }).catch((err)=>{
+          console.log(err.message);
+        })
+      }
+    }).catch((err)=>{
+      if(err.code === 'auth/email-already-in-use'){
+        navigation.navigate('Login');
+        setLoading(false);
+      }
+      console.log(err.message);
+    })
+  }
   return (
     <ScrollView>
       <View style={[GlobalStyles.container, styles.container]}>
@@ -40,8 +73,8 @@ const SignUp = () => {
           initialValues={{ name: '', email: '', password: '' }}
           validationSchema={signUpSchema}
           onSubmit={(values, actions) => {
+            signUpUser(values);
             actions.resetForm();
-            console.log(values);
           }}
         >
           {(props) => (
@@ -101,7 +134,7 @@ const SignUp = () => {
                   and{' '}
                   <Text style={{ color: COLOR.primary }}>privacy policy</Text>
                 </Text>
-                <Button title="Continue" onPress={props.handleSubmit} />
+                <Button title={loading ? <ActivityIndicator color="#fff" /> : 'Continue'} onPress={props.handleSubmit} />
                 <Text style={styles.bottomText}>
                   Already have an account ?{' '}
                   <Text
