@@ -18,6 +18,7 @@ export const COLOR = {
   primary: '#0076FF',
   background: '#fff',
   white: '#fff',
+  gray: '#D9D9D9',
 };
 
 export const FONTS = {

@@ -29,8 +29,11 @@ const OnBoarding = () => {
         </Text>
       </View>
 
+      {/* Image  */}
       <View style={styles.ImgContainer}>
         <Image
+          resizeMode="contain"
+          resizeMethod="auto"
           style={styles.Image}
           source={require('../../../assets/Images/onBoarding.png')}
         />
@@ -41,7 +44,10 @@ const OnBoarding = () => {
           As the name says , Daily me provides every necessary tools to help you
           out in daily life.
         </Text>
-        <Button title="Get Started" />
+        <Button
+          title="Get Started"
+          onPress={() => navigation.navigate('SignUp')}
+        />
       </View>
     </View>
   );

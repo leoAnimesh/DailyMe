@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     color: COLOR.primary,
   },
   header: {
-    marginVertical: hp(5),
+    marginVertical: hp(6),
   },
   headerText: {
     fontSize: SIZES.heading,
@@ -25,8 +25,7 @@ const styles = StyleSheet.create({
     lineHeight: 35,
   },
   ImgContainer: {
-    width: wp(85),
-    height: hp(30),
+    flex: 1,
   },
   Image: {
     width: '100%',

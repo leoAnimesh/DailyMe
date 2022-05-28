@@ -10,6 +10,9 @@ import {
 } from '@expo-google-fonts/inter';
 import AppLoading from 'expo-app-loading';
 import { FONTS } from './src/constants/GlobalTheme';
+import store, { persistor } from './src/app/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -32,8 +35,12 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer theme={MyTheme}>
-      <Routes />
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer theme={MyTheme}>
+        <PersistGate persistor={persistor}>
+          <Routes />
+        </PersistGate>
+      </NavigationContainer>
+    </Provider>
   );
 }

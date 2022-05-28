@@ -2,10 +2,18 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import { COLOR, FONTS, SIZES, wp } from '../../constants/GlobalTheme';
 
-const Button = ({ title = 'Button' }) => {
+const Button = ({
+  title = 'Button',
+  containerStyles,
+  textStyles,
+  ...props
+}) => {
   return (
-    <TouchableOpacity style={styles.container}>
-      <Text style={styles.btnText}>{title}</Text>
+    <TouchableOpacity
+      style={[styles.container, { ...containerStyles }]}
+      {...props}
+    >
+      <Text style={[styles.btnText, { ...textStyles }]}>{title}</Text>
     </TouchableOpacity>
   );
 };
