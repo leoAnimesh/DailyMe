@@ -5,50 +5,50 @@ import {
   RefreshControl,
   TouchableOpacity,
   ScrollView,
-} from 'react-native';
-import React from 'react';
-import styles from './TasksStyles';
-import { GlobalStyles } from '../../constants/GlobalStyles';
-import { TaskIcon } from '../../../assets';
-import { COLOR, FONTS, hp } from '../../constants/GlobalTheme';
+} from "react-native";
+import React from "react";
+import styles from "./TasksStyles";
+import { GlobalStyles } from "../../constants/GlobalStyles";
+import { TaskIcon } from "../../../assets";
+import { COLOR, FONTS, hp } from "../../constants/GlobalTheme";
 import {
   CategoryList,
   StatusBar,
   TaskBottomSheet,
   TaskCard,
-} from '../../components';
-import { useDispatch, useSelector } from 'react-redux';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { getTasks } from '../../redux/tasksSlice';
+} from "../../components";
+import { useDispatch, useSelector } from "react-redux";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { getTasks } from "../../redux/tasksSlice";
 
 const Tasks = () => {
   const TaskBottomSheetRef = React.useRef(null);
   const userId = useSelector((state) => state.user.user.id);
   const allTasks = useSelector((state) => state.tasks.tasks);
-  const [mode, setMode] = React.useState('add');
+  const [mode, setMode] = React.useState("add");
   const [currentTaskIndex, setCurrentTaskIndex] = React.useState(0);
 
   const openEditSheet = (index) => {
-    setMode('edit');
+    setMode("edit");
     setCurrentTaskIndex(index);
     TaskBottomSheetRef.current.open();
   };
 
   const openViewSheet = (index) => {
-    setMode('view');
+    setMode("view");
     setCurrentTaskIndex(index);
     TaskBottomSheetRef.current.open();
   };
 
   const options = [
-    { name: 'All', length: allTasks.length },
+    { name: "All", length: allTasks.length },
     {
-      name: 'Pending',
+      name: "Pending",
       length: allTasks.filter((item) => item.completed === false).length,
     },
     {
-      name: 'Completed',
+      name: "Completed",
       length: allTasks.filter((item) => item.completed === true).length,
     },
   ];
@@ -58,20 +58,32 @@ const Tasks = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    const colRef = collection(db, 'user', userId, 'tasks');
+    const colRef = collection(db, "user", userId, "tasks");
     getDocs(colRef)
       .then((snapshot) => {
         let tasks = [];
         snapshot.docs.forEach((doc) => {
           tasks.push({ ...doc.data(), id: doc.id });
         });
-        console.log('fetched');
+        console.log("fetched");
         dispatch(getTasks(tasks));
         setRefreshing(false);
       })
       .catch((err) => {
         console.log(err.message);
       });
+  };
+
+  const filterByCategory = () => {
+    if (selected === "All") {
+      return allTasks;
+    }
+    if (selected === "Pending") {
+      return allTasks.filter((task) => task.completed === false);
+    }
+    if (selected === "Completed") {
+      return allTasks.filter((task) => task.completed === true);
+    }
   };
 
   return (
@@ -85,18 +97,18 @@ const Tasks = () => {
       <View style={[styles.progressBar]}>
         <View style={styles.progressBarTop}>
           <Text style={styles.progressBarText}>
-            Your Tasks are {'\n'} Going Great
+            Your Tasks are {"\n"} Going Great
           </Text>
           <Image
             style={styles.BannerImg}
-            source={require('../../../assets/Images/TaskBanner.png')}
+            source={require("../../../assets/Images/TaskBanner.png")}
           />
         </View>
         <View>
           <Text style={styles.progressText}>
             <Text style={{ fontFamily: FONTS.semiBold }}>
               {Math.floor((options[2].length / options[0].length) * 100)} %
-            </Text>{' '}
+            </Text>{" "}
             progress
           </Text>
           <View style={styles.Bar}>
@@ -118,9 +130,9 @@ const Tasks = () => {
       <View style={styles.TasksContainer}>
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <Text style={{ fontFamily: FONTS.medium, fontSize: 20 }}>
@@ -129,14 +141,14 @@ const Tasks = () => {
           <TouchableOpacity
             style={{
               backgroundColor: COLOR.primary,
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               paddingVertical: 5,
               paddingHorizontal: 15,
               borderRadius: 5,
             }}
             onPress={() => {
-              setMode('add');
+              setMode("add");
               TaskBottomSheetRef.current.open();
             }}
           >
@@ -154,43 +166,26 @@ const Tasks = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {allTasks.map((item, index) => {
-            if (selected === 'All') {
-              return (
-                <TaskCard
-                  key={index}
-                  data={item}
-                  openEditSheet={() => openEditSheet(index)}
-                  openViewSheet={() => openViewSheet(index)}
-                />
-              );
-            }
-            if (selected === 'Pending') {
-              if (item.completed === false) {
-                return (
-                  <TaskCard
-                    key={index}
-                    data={item}
-                    openEditSheet={() => openEditSheet(index)}
-                    openViewSheet={() => openViewSheet(index)}
-                  />
-                );
-              }
-            }
-            if (selected === 'Completed') {
-              if (item.completed === true) {
-                return (
-                  <TaskCard
-                    key={index}
-                    data={item}
-                    openEditSheet={() => openEditSheet(index)}
-                    openViewSheet={() => openViewSheet(index)}
-                  />
-                );
-              }
-            }
-          })}
+          {filterByCategory().length === 0 ? (
+            <Text style={{ fontFamily: FONTS.medium, marginVertical: 15 }}>
+              No {selected} Tasks
+            </Text>
+          ) : (
+            filterByCategory().map((item, index) => (
+              <TaskCard
+                key={index}
+                data={item}
+                openEditSheet={() => openEditSheet(index)}
+                openViewSheet={() => openViewSheet(index)}
+              />
+            ))
+          )}
         </ScrollView>
+        {selected === "completed" && options[2].length === 0 ? (
+          <Text style={{ position: "absolute", zIndex: 10 }}>
+            No Completed Task
+          </Text>
+        ) : null}
       </View>
       <TaskBottomSheet
         reference={TaskBottomSheetRef}
