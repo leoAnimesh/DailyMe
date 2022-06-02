@@ -5,7 +5,7 @@ const initialState = {
 };
 
 export const tasksSlice = createSlice({
-  name: 'user',
+  name: 'tasks',
   initialState,
   reducers: {
     addTask: (state, action) => {
@@ -20,11 +20,11 @@ export const tasksSlice = createSlice({
         return task;
       });
     },
-    updateTask : (state,action) => {
-      const {id,data} = action.payload;
-      state.tasks = state.tasks.filter(task => task.id !== id);
-      state.tasks = [...state.tasks,data];
-    }, 
+    updateTask: (state, action) => {
+      const { id, data } = action.payload;
+      state.tasks = state.tasks.filter((task) => task.id !== id);
+      state.tasks = [...state.tasks, data];
+    },
     deleteTask: (state, action) => {
       const { id } = action.payload;
       state.tasks = state.tasks.filter((task) => task.id !== id);
@@ -35,6 +35,6 @@ export const tasksSlice = createSlice({
   },
 });
 
-export const { addTask, taskCompleted, getTasks, deleteTask,updateTask } =
+export const { addTask, taskCompleted, getTasks, deleteTask, updateTask } =
   tasksSlice.actions;
 export default tasksSlice.reducer;

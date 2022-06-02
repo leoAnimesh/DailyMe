@@ -6,3 +6,5 @@ export { default as TaskCard } from './Shared/TasksCard';
 export { default as ModesSelector } from './Shared/ModesSelector';
 
 export { default as TaskBottomSheet } from './BottomSheets/TasksBottomSheet';
+export { default as WebViewBottomSheet } from './BottomSheets/WebViewBottomSheet';
+export { default as WebAppsBottomSheet } from './BottomSheets/WebAppsBottomSheet';

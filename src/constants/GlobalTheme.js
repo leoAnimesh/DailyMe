@@ -19,6 +19,7 @@ export const COLOR = {
   background: '#fff',
   white: '#fff',
   gray: '#D9D9D9',
+  lighGray: '#F9F9F9',
 };
 
 export const FONTS = {

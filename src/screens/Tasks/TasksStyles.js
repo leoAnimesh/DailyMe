@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
     color: COLOR.white,
   },
   BannerImg: {
-    width: 90,
-    height: 90,
+    width: 85,
+    height: 85,
   },
   Bar: {
     width: '100%',

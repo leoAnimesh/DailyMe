@@ -1,26 +1,27 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import React from "react";
-import { COLOR, FONTS, wp } from "../../constants/GlobalTheme";
-import { MaterialIcons } from "@expo/vector-icons";
-import { CheckIcon } from "../../../assets";
-import { useDispatch, useSelector } from "react-redux";
-import { formatDate } from "../../utils";
-import { collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/config";
-import { taskCompleted, deleteTask } from "../../redux/tasksSlice";
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
+import { COLOR, FONTS, wp } from '../../constants/GlobalTheme';
+import { MaterialIcons } from '@expo/vector-icons';
+import { CheckIcon } from '../../../assets';
+import { useDispatch, useSelector } from 'react-redux';
+import { formatDate } from '../../utils';
+import { collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase/config';
+
+import { taskCompleted, deleteTask } from '../../redux/tasksSlice';
 const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
   const userId = useSelector((state) => state.user.user.id);
   const dispatch = useDispatch();
 
   const markAsComplete = (id) => {
     if (
-      data?.date["seconds"] * 1000 < Date.now() &&
+      data?.date['seconds'] * 1000 < Date.now() &&
       data?.completed === false
     ) {
       dispatch(taskCompleted({ id: id, completed: true }));
-      const docRef = doc(db, "user", userId, "tasks", id);
+      const docRef = doc(db, 'user', userId, 'tasks', id);
       updateDoc(docRef, { completed: true }).then(() => {
-        console.log("Task completed");
+        console.log('Task completed');
       });
     }
     return;
@@ -28,9 +29,9 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
 
   const deletingTask = (id) => {
     dispatch(deleteTask({ id: id }));
-    deleteDoc(doc(db, "user", userId, "tasks", id))
+    deleteDoc(doc(db, 'user', userId, 'tasks', id))
       .then(() => {
-        console.log("task deleted");
+        console.log('task deleted');
       })
       .catch((err) => {
         console.log(err.message);
@@ -50,22 +51,22 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
         marginTop: 15,
       }}
     >
-      <View style={{ flexDirection: "row" }}>
-        {data.meetingApp === "Zoom" ? (
+      <View style={{ flexDirection: 'row' }}>
+        {data.meetingApp === 'Zoom' ? (
           <Image
-            source={require("../../../assets/Images/zoom.png")}
+            source={require('../../../assets/Images/zoom.png')}
             style={{ width: 35, height: 35, marginRight: 20 }}
           />
         ) : null}
-        {data.meetingApp === "Google Meet" ? (
+        {data.meetingApp === 'Google Meet' ? (
           <Image
-            source={require("../../../assets/Images/meet.png")}
+            source={require('../../../assets/Images/meet.png')}
             style={{ width: 40, height: 40, marginRight: 15 }}
           />
         ) : null}
-        {data.meetingApp === "other" ? (
+        {data.meetingApp === 'other' ? (
           <Image
-            source={require("../../../assets/Images/web-link.png")}
+            source={require('../../../assets/Images/web-link.png')}
             style={{ width: 40, height: 40, marginRight: 15 }}
           />
         ) : null}
@@ -75,7 +76,7 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
               fontSize: 13,
               fontFamily: FONTS.semiBold,
               marginBottom: 3,
-              textDecorationLine: data?.completed ? "line-through" : "none",
+              textDecorationLine: data?.completed ? 'line-through' : 'none',
             }}
           >
             {data?.title}
@@ -85,7 +86,7 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
               fontSize: 10,
               fontFamily: FONTS.regular,
               marginBottom: 10,
-              textDecorationLine: data?.completed ? "line-through" : "none",
+              textDecorationLine: data?.completed ? 'line-through' : 'none',
               width: wp(65),
 
               lineHeight: 18,
@@ -96,7 +97,7 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
         </View>
         {data.completed && (
           <MaterialIcons
-            style={{ position: "absolute", right: 35, top: 5 }}
+            style={{ position: 'absolute', right: 35, top: 5 }}
             name="delete"
             size={23}
             color="black"
@@ -110,11 +111,11 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
             height: 20,
             backgroundColor: COLOR.primary,
             borderRadius: 20,
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           {data?.completed ? (
@@ -124,7 +125,7 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
               style={{
                 width: 15,
                 height: 15,
-                position: "absolute",
+                position: 'absolute',
                 backgroundColor: COLOR.white,
                 borderRadius: 20,
               }}
@@ -136,14 +137,14 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
       <View
         style={{
           borderWidth: 0.5,
-          width: "98%",
-          alignSelf: "center",
+          width: '98%',
+          alignSelf: 'center',
           borderColor: COLOR.gray,
         }}
       ></View>
 
       <View
-        style={{ marginTop: 13, flexDirection: "row", alignItems: "center" }}
+        style={{ marginTop: 13, flexDirection: 'row', alignItems: 'center' }}
       >
         <MaterialIcons name="date-range" size={15} color="black" />
         <Text
@@ -156,7 +157,7 @@ const TasksCard = ({ data, openEditSheet, openViewSheet }) => {
         >
           {formatDate(data?.date)}
         </Text>
-        <View style={{ flexDirection: "row", position: "absolute", right: 0 }}>
+        <View style={{ flexDirection: 'row', position: 'absolute', right: 0 }}>
           <TouchableOpacity
             style={{
               backgroundColor: COLOR.primary,

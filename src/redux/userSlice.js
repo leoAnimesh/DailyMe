@@ -15,9 +15,9 @@ export const userSlice = createSlice({
     },
     clearUser: () => {
       return initialState;
-    }
+    },
   },
 });
 
-export const { setAuth,clearUser } = userSlice.actions;
+export const { setAuth, clearUser } = userSlice.actions;
 export default userSlice.reducer;
