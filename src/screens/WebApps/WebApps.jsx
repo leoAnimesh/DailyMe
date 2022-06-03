@@ -25,7 +25,7 @@ import {
 } from '../../redux/appLinksSlice';
 import { db } from '../../firebase/config';
 
-const WebApps = () => {
+const WebApps = ({ navigation }) => {
   const webViewBottomSheetRef = React.useRef(null);
   const addAppsRef = React.useRef(null);
   const [mode, setMode] = React.useState('apps');
@@ -86,9 +86,12 @@ const WebApps = () => {
     >
       <View style={{ flex: 1, paddingTop: hp(6) }}>
         <StatusBar />
-        <View style={{ marginHorizontal: 30, marginBottom: 15 }}>
+        <TouchableOpacity
+          style={{ marginHorizontal: 30, marginBottom: 15 }}
+          onPress={() => navigation.openDrawer()}
+        >
           <AppsLogo />
-        </View>
+        </TouchableOpacity>
 
         <View
           style={{
@@ -128,6 +131,9 @@ const WebApps = () => {
             marginHorizontal: 25,
           }}
         >
+          {webApps.length === 0 && (
+            <Text style={{ marginLeft: 5 }}>No web apps found ⚠</Text>
+          )}
           {webApps.map((item, index) => (
             <TouchableOpacity
               key={index}
@@ -224,6 +230,9 @@ const WebApps = () => {
             </TouchableOpacity>
           </View>
           <ScrollView>
+            {links.length === 0 && (
+              <Text style={{ marginLeft: 5 }}>No links found ⚠</Text>
+            )}
             {links.map((link, index) => (
               <TouchableOpacity
                 activeOpacity={0.7}

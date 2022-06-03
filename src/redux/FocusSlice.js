@@ -1,13 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  focusTasks : [{
-      id:1,
-      task:'Coding',
-      sets : 4,
-      currentSet : 0,
-      hour: 2,
-  }],
+  focusTasks: [],
 };
 
 export const focusSlice = createSlice({
@@ -15,18 +9,25 @@ export const focusSlice = createSlice({
   initialState,
   reducers: {
     setFocusTasks: (state, action) => {
-      state.focusTasks = [...state.focusTasks,action.payload]
+      state.focusTasks = [...state.focusTasks, action.payload];
     },
-    IncreaseStep: (state,action) => {
-      const {id} = action.payload;
-      state.focusTasks = state.focusTasks.map((item)=>{
-          if(item.id === id){
-              return {...item,currentSet: item.currentSet + 1}
-          }
-      })
+    IncreaseStep: (state, action) => {
+      const { id } = action.payload;
+      state.focusTasks = state.focusTasks.map((item) => {
+        if (item.id === id) {
+          return { ...item, currentSet: item.currentSet + 1 };
+        }
+      });
+    },
+    AddFocusTask: (state, action) => {
+      state.focusTasks = [...state.focusTasks, action.payload];
+    },
+    getFocusTasks: (state, action) => {
+      state.focusTasks = action.payload;
     },
   },
 });
 
-export const { setFocusTasks, IncreaseStep } = focusSlice.actions;
+export const { setFocusTasks, IncreaseStep, AddFocusTask, getFocusTasks } =
+  focusSlice.actions;
 export default focusSlice.reducer;

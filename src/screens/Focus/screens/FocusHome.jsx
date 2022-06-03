@@ -1,34 +1,69 @@
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
-import React from "react";
-import { GlobalStyles } from "../../../constants/GlobalStyles";
-import { Button, StatusBar } from "../../../components";
-import { COLOR, FONTS, hp, SIZES } from "../../../constants/GlobalTheme";
-import { FocusLogo, TaskIcon } from "../../../../assets";
-import CategoryToogler from "../../../components/Shared/CategoryToogler";
-import { Foundation } from "@expo/vector-icons";
-import moment from "moment";
-import { useSelector } from "react-redux";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import React from 'react';
+import { GlobalStyles } from '../../../constants/GlobalStyles';
+import { Button, FocusBottomSheet, StatusBar } from '../../../components';
+import { COLOR, FONTS, hp, SIZES } from '../../../constants/GlobalTheme';
+import { FocusLogo, TaskIcon } from '../../../../assets';
+import CategoryToogler from '../../../components/Shared/CategoryToogler';
+import { Foundation } from '@expo/vector-icons';
+import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import { collection, getDocs } from 'firebase/firestore';
+import { getFocusTasks } from '../../../redux/FocusSlice';
+import { db } from '../../../firebase/config';
+import { formatDate } from '../../../utils';
 
 const FocusHome = ({ navigation }) => {
   const focusTasks = useSelector((state) => state.focus.focusTasks);
+  const focusBottomSheetRef = React.useRef(null);
+  const userId = useSelector((state) => state.user.user.id);
+  const dispatch = useDispatch();
+  const [refreshing, setRefreshing] = React.useState(false);
   const options = [
-    { name: "All", length: 0 },
+    { name: 'All', length: 0 },
     {
-      name: "Pending",
+      name: 'Pending',
       length: 0,
     },
     {
-      name: "Completed",
+      name: 'Completed',
       length: 0,
     },
   ];
+  const onRefresh = async () => {
+    setRefreshing(true);
+    const colRef = collection(db, 'user', userId, 'focus');
+    getDocs(colRef)
+      .then((snapshot) => {
+        let tasks = [];
+        snapshot.docs.forEach((doc) => {
+          tasks.push({ ...doc.data(), id: doc.id });
+        });
+        console.log('fetched');
+        dispatch(getFocusTasks(tasks));
+        setRefreshing(false);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
   const [selected, setSelected] = React.useState(options[1].name);
   return (
     <View style={GlobalStyles.container}>
       <StatusBar />
-      <View style={{ marginHorizontal: hp(4) }}>
+      <TouchableOpacity
+        style={{ marginHorizontal: hp(4) }}
+        onPress={() => navigation.toggleDrawer()}
+      >
         <FocusLogo />
-      </View>
+      </TouchableOpacity>
 
       {/* progress banner */}
       <View
@@ -40,7 +75,7 @@ const FocusHome = ({ navigation }) => {
           marginHorizontal: hp(4),
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text
             style={{
               fontSize: 20,
@@ -49,11 +84,11 @@ const FocusHome = ({ navigation }) => {
               color: COLOR.white,
             }}
           >
-            Here is the progress{"\n"}of your focus tasks
+            Here is the progress{'\n'}of your focus tasks
           </Text>
           <Image
             style={{ width: 85, height: 85 }}
-            source={require("../../../../assets/Images/TaskBanner.png")}
+            source={require('../../../../assets/Images/TaskBanner.png')}
           />
         </View>
         <View>
@@ -64,22 +99,22 @@ const FocusHome = ({ navigation }) => {
               {Math.floor((options[2].length / options[0].length) * 100) !==
                 NaN && 0}
               %
-            </Text>{" "}
+            </Text>{' '}
             Progress
           </Text>
           <View
             style={{
-              width: "100%",
+              width: '100%',
               height: 6,
-              backgroundColor: "#D2C4C4",
-              position: "relative",
+              backgroundColor: '#D2C4C4',
+              position: 'relative',
             }}
           >
             <View
               style={[
                 {
-                  position: "absolute",
-                  width: "35%",
+                  position: 'absolute',
+                  width: '35%',
                   height: 6,
                   backgroundColor: COLOR.white,
                   width: `${
@@ -97,9 +132,9 @@ const FocusHome = ({ navigation }) => {
       <View style={{ flex: 1, backgroundColor: COLOR.lighGray }}>
         <View
           style={{
-            justifyContent: "space-between",
-            flexDirection: "row",
-            alignItems: "center",
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            alignItems: 'center',
             paddingHorizontal: 30,
             marginTop: 25,
           }}
@@ -115,11 +150,12 @@ const FocusHome = ({ navigation }) => {
           <Button
             title="Add +"
             containerStyles={{
-              width: "auto",
-              height: "auto",
-              paddingHorizontal: 10,
+              width: 'auto',
+              height: 'auto',
+              paddingHorizontal: 15,
               paddingVertical: 5,
             }}
+            onPress={() => focusBottomSheetRef.current.open()}
             textStyles={{ fontSize: 12 }}
           />
         </View>
@@ -127,9 +163,9 @@ const FocusHome = ({ navigation }) => {
         <View
           style={{
             marginHorizontal: 30,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
           <CategoryToogler
@@ -140,9 +176,15 @@ const FocusHome = ({ navigation }) => {
         </View>
 
         {/* focus task list */}
-        <ScrollView>
-          {focusTasks.map((item) => (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {focusTasks.map((item, index) => (
             <View
+              key={index}
               style={[
                 GlobalStyles.shadow,
                 {
@@ -163,7 +205,7 @@ const FocusHome = ({ navigation }) => {
                   marginBottom: 5,
                 }}
               >
-                {item?.task}
+                {item?.title}
               </Text>
               <Text
                 style={{
@@ -172,14 +214,15 @@ const FocusHome = ({ navigation }) => {
                   fontSize: 12,
                 }}
               >
-                Progress {Math.floor((item.currentSet / item.sets) * 100)} %
+                Progress{' '}
+                {Math.floor((item?.currentSet / item?.timing?.sets) * 100)} %
               </Text>
               <View
                 style={{
-                  width: "97%",
+                  width: '97%',
                   height: 6,
-                  backgroundColor: COLOR.primary,
-                  position: "relative",
+                  backgroundColor: COLOR.gray,
+                  position: 'relative',
                   marginHorizontal: 5,
                   marginVertical: 10,
                 }}
@@ -187,11 +230,11 @@ const FocusHome = ({ navigation }) => {
                 <View
                   style={[
                     {
-                      position: "absolute",
+                      position: 'absolute',
                       height: 6,
-                      backgroundColor: COLOR.gray,
+                      backgroundColor: COLOR.primary,
                       width: `${Math.floor(
-                        (item.currentSet / item.sets) * 100
+                        (item?.currentSet / item?.timing?.sets) * 100
                       )}%`,
                     },
                   ]}
@@ -199,8 +242,8 @@ const FocusHome = ({ navigation }) => {
               </View>
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
                   marginTop: 5,
                 }}
               >
@@ -212,7 +255,7 @@ const FocusHome = ({ navigation }) => {
                       fontSize: 13,
                     }}
                   >
-                    Steps Done : {item.currentSet} / {item.sets}
+                    Steps Done : {item?.currentSet} / {item?.timing?.sets}
                   </Text>
                   <Text
                     style={{
@@ -223,17 +266,19 @@ const FocusHome = ({ navigation }) => {
                       marginTop: 3,
                     }}
                   >
-                    {moment(new Date()).format("MMMM Do YYYY, h:mm a")}
+                    {formatDate(item?.date)}
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("focusTimer")}
+                  onPress={() =>
+                    navigation.navigate('focusTimer', { index: index })
+                  }
                   style={{
                     backgroundColor: COLOR.primary,
                     height: 35,
                     width: 35,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     borderRadius: 50,
                   }}
                 >
@@ -244,6 +289,7 @@ const FocusHome = ({ navigation }) => {
           ))}
         </ScrollView>
       </View>
+      <FocusBottomSheet reference={focusBottomSheetRef} />
     </View>
   );
 };

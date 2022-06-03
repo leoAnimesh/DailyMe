@@ -22,7 +22,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { getTasks } from '../../redux/tasksSlice';
 
-const Tasks = () => {
+const Tasks = ({ navigation }) => {
   const TaskBottomSheetRef = React.useRef(null);
   const userId = useSelector((state) => state.user.user.id);
   const allTasks = useSelector((state) => state.tasks.tasks);
@@ -89,9 +89,12 @@ const Tasks = () => {
   return (
     <View style={GlobalStyles.container}>
       <StatusBar />
-      <View style={{ marginHorizontal: hp(4) }}>
+      <TouchableOpacity
+        style={{ marginHorizontal: hp(4) }}
+        onPress={() => navigation.openDrawer()}
+      >
         <TaskIcon />
-      </View>
+      </TouchableOpacity>
 
       {/* progress banner */}
       <View style={[styles.progressBar]}>

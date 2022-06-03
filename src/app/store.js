@@ -5,19 +5,20 @@ import { persistReducer, persistStore } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import tasksSlice from '../redux/tasksSlice';
 import appLinksSlice from '../redux/appLinksSlice';
-import focusSlice  from '../redux/FocusSlice';
+import focusSlice from '../redux/FocusSlice';
 
 const rootReducer = combineReducers({
   user: userSlice,
   tasks: tasksSlice,
   apps: appLinksSlice,
-  focus : focusSlice
+  focus: focusSlice,
 });
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
+  blacklist: ['tasks', 'apps', 'focus'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

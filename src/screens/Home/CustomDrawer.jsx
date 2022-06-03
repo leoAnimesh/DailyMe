@@ -1,14 +1,16 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import { COLOR, hp } from '../../constants/GlobalTheme';
+import { COLOR, FONTS, hp } from '../../constants/GlobalTheme';
 import { useDispatch } from 'react-redux';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/config';
 import { clearUser } from '../../redux/userSlice';
+import { AntDesign } from '@expo/vector-icons';
+
 const CustomDrawer = ({ ...props }) => {
   const dispatch = useDispatch();
   const handleSignOut = () => {
@@ -26,16 +28,64 @@ const CustomDrawer = ({ ...props }) => {
         {...props}
         contentContainerStyle={{ backgroundColor: COLOR.primary }}
       >
-        <View style={styles.header}>
-          <Text>Animesh Mondal</Text>
-          <Text>mondalarup808@gmail.com</Text>
+        <View
+          style={[
+            styles.header,
+            {
+              justifyContent: 'space-evenly',
+              paddingBottom: 15,
+              paddingLeft: 20,
+            },
+          ]}
+        >
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              backgroundColor: COLOR.white,
+              borderRadius: 50,
+              overflow: 'hidden',
+              borderWidth: 5,
+              borderColor: COLOR.lighGray,
+            }}
+          >
+            <Image
+              style={{ width: '100%', height: '100%' }}
+              source={{ uri: 'https://robohash.org/hjggfsdf?set=set2' }}
+            />
+          </View>
+          <View>
+            <Text style={{ fontFamily: FONTS.medium, color: COLOR.white }}>
+              Animesh Mondal
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                color: COLOR.white,
+                fontSize: 12,
+              }}
+            >
+              mondalarup808@gmail.com
+            </Text>
+          </View>
         </View>
         <View style={{ backgroundColor: '#fff' }}>
           <DrawerItemList {...props} />
         </View>
       </DrawerContentScrollView>
-      <TouchableOpacity onPress={() => handleSignOut()}>
-        <Text>SignOut</Text>
+      <TouchableOpacity
+        style={{ position: 'absolute', bottom: 25, left: 30 }}
+        onPress={() => handleSignOut()}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ fontFamily: FONTS.medium }}>SignOut </Text>
+          <AntDesign
+            name="logout"
+            size={15}
+            style={{ marginLeft: 5, color: 'red' }}
+            color="black"
+          />
+        </View>
       </TouchableOpacity>
     </View>
   );
