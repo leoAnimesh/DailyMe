@@ -5,6 +5,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import React from 'react';
 import styles from './TasksStyles';
@@ -52,12 +53,13 @@ const Tasks = ({ navigation }) => {
       length: allTasks.filter((item) => item.completed === true).length,
     },
   ];
+
   const [selected, setSelected] = React.useState(options[1].name);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const dispatch = useDispatch();
 
-  const onRefresh = async () => {
-    setRefreshing(true);
+  const getAllTasks = () => {
     const colRef = collection(db, 'user', userId, 'tasks');
     getDocs(colRef)
       .then((snapshot) => {
@@ -67,11 +69,17 @@ const Tasks = ({ navigation }) => {
         });
         console.log('fetched');
         dispatch(getTasks(tasks));
+        setLoading(false);
         setRefreshing(false);
       })
       .catch((err) => {
         console.log(err.message);
       });
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    getAllTasks();
   };
 
   const filterByCategory = () => {
@@ -85,6 +93,12 @@ const Tasks = ({ navigation }) => {
       return allTasks.filter((task) => task.completed === true);
     }
   };
+
+  React.useEffect(() => {
+    if (allTasks.length === 0 || allTasks === null) {
+      getAllTasks();
+    }
+  }, []);
 
   return (
     <View style={GlobalStyles.container}>
@@ -163,13 +177,20 @@ const Tasks = ({ navigation }) => {
           selected={selected}
           setSelected={setSelected}
         />
+        {loading && (
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <ActivityIndicator color={'#000'} />
+          </View>
+        )}
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {filterByCategory().length === 0 ? (
+          {filterByCategory().length === 0 && !loading ? (
             <Text style={{ fontFamily: FONTS.medium, marginVertical: 15 }}>
               No {selected} Tasks
             </Text>
@@ -184,11 +205,6 @@ const Tasks = ({ navigation }) => {
             ))
           )}
         </ScrollView>
-        {selected === 'completed' && options[2].length === 0 ? (
-          <Text style={{ position: 'absolute', zIndex: 10 }}>
-            No Completed Task
-          </Text>
-        ) : null}
       </View>
       <TaskBottomSheet
         reference={TaskBottomSheetRef}

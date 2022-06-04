@@ -13,7 +13,7 @@ import {
   WebAppsBottomSheet,
   WebViewBottomSheet,
 } from '../../components';
-import { COLOR, FONTS, hp, wp } from '../../constants/GlobalTheme';
+import { COLOR, FONTS, SIZES, hp, wp } from '../../constants/GlobalTheme';
 import { AppsLogo } from '../../../assets';
 import { useDispatch, useSelector } from 'react-redux';
 import * as expoBrowser from 'expo-web-browser';
@@ -35,11 +35,36 @@ const WebApps = ({ navigation }) => {
   const [refreshing, setRefreshing] = React.useState(false);
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.user.user.id);
+  const [loading, setLoading] = React.useState(true);
+  const DefaultwebApps = [
+    {
+      name: 'ABP news',
+      link: 'https://bengali.abplive.com/',
+    },
+    { name: 'Times of India', link: 'https://timesofindia.indiatimes.com/' },
+    {
+      name: 'Github',
+      link: 'https://github.com/',
+    },
+    {
+      name: 'Medium',
+      link: 'https://medium.com/',
+    },
+    {
+      name: 'Pinterest',
+      link: 'https://in.pinterest.com/',
+    },
+    { name: 'Goggle meet', link: 'https://meet.google.com/' },
+    { name: 'Zoom Meet', link: 'https://zoom.us/' },
+    {
+      name: 'JISCE',
+      link: 'https://jiscollege.ac.in/',
+    },
+  ];
 
-  const onRefresh = async () => {
+  const getAllAppsAndLinks = async () => {
     let apps = [];
     let links = [];
-    setRefreshing(true);
     try {
       const appData = await getDocs(collection(db, 'user', userId, 'apps'));
       appData.docs.forEach((doc) => {
@@ -51,9 +76,15 @@ const WebApps = ({ navigation }) => {
       });
       dispatch(getAppsandLinks({ apps, links }));
       setRefreshing(false);
+      setLoading(false);
     } catch (err) {
       console.log(err.message);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    getAllAppsAndLinks();
   };
 
   const deleteLinks = (id) => {
@@ -78,6 +109,10 @@ const WebApps = ({ navigation }) => {
       });
   };
 
+  React.useEffect(() => {
+    webApps.length === 0 && links.length === 0 && getAllAppsAndLinks();
+  }, []);
+
   return (
     <ScrollView
       refreshControl={
@@ -93,9 +128,81 @@ const WebApps = ({ navigation }) => {
           <AppsLogo />
         </TouchableOpacity>
 
+        {/* progress banner */}
         <View
           style={{
-            marginTop: hp(2),
+            backgroundColor: COLOR.primary,
+            padding: 18,
+            borderRadius: SIZES.sm,
+            marginBottom: hp(3),
+            marginTop: 10,
+            marginHorizontal: 25,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <View style={{ width: '68%' }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: FONTS.semiBold,
+                  lineHeight: 24,
+                  color: COLOR.white,
+                }}
+              >
+                Add your favorite web apps & important links
+              </Text>
+              <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                <Text
+                  style={{
+                    backgroundColor: COLOR.lighGray,
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    fontSize: 11,
+                    marginRight: 10,
+                    borderRadius: 5,
+                    fontFamily: FONTS.regular,
+                  }}
+                >
+                  Apps{' '}
+                  <Text
+                    style={{ color: COLOR.primary, fontFamily: FONTS.bold }}
+                  >
+                    {webApps.length}
+                  </Text>
+                </Text>
+                <Text
+                  style={{
+                    backgroundColor: COLOR.lighGray,
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    fontSize: 11,
+                    marginRight: 10,
+                    borderRadius: 5,
+                  }}
+                >
+                  Links{' '}
+                  <Text
+                    style={{ color: COLOR.primary, fontFamily: FONTS.bold }}
+                  >
+                    {links.length}
+                  </Text>
+                </Text>
+              </View>
+            </View>
+            <Image
+              style={{ width: 85, height: 85 }}
+              source={require('../../../assets/Images/TaskBanner.png')}
+            />
+          </View>
+        </View>
+
+        <View
+          style={{
             marginBottom: 10,
             marginHorizontal: 30,
             flexDirection: 'row',
@@ -127,13 +234,11 @@ const WebApps = ({ navigation }) => {
           style={{
             marginTop: hp(2),
             flexDirection: 'row',
+            justifyContent: 'space-between',
             flexWrap: 'wrap',
             marginHorizontal: 25,
           }}
         >
-          {webApps.length === 0 && (
-            <Text style={{ marginLeft: 5 }}>No web apps found ⚠</Text>
-          )}
           {webApps.map((item, index) => (
             <TouchableOpacity
               key={index}
@@ -146,13 +251,14 @@ const WebApps = ({ navigation }) => {
               }}
               style={[
                 {
-                  paddingVertical: 10,
-                  paddingHorizontal: 15,
-                  marginBottom: 10,
+                  marginBottom: 12,
                   borderRadius: 5,
                   borderWidth: 1,
                   borderColor: COLOR.gray,
-                  marginRight: 5,
+                  width: wp(20),
+                  height: hp(8),
+                  justifyContent: 'space-evenly',
+                  alignItems: 'center',
                 },
               ]}
             >

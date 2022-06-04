@@ -5,13 +5,14 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import { COLOR, FONTS, hp } from '../../constants/GlobalTheme';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/config';
 import { clearUser } from '../../redux/userSlice';
 import { AntDesign } from '@expo/vector-icons';
 
 const CustomDrawer = ({ ...props }) => {
+  const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const handleSignOut = () => {
     signOut(auth)
@@ -51,12 +52,12 @@ const CustomDrawer = ({ ...props }) => {
           >
             <Image
               style={{ width: '100%', height: '100%' }}
-              source={{ uri: 'https://robohash.org/hjggfsdf?set=set2' }}
+              source={{ uri: `https://robohash.org/${user.email}?set=set2` }}
             />
           </View>
           <View>
             <Text style={{ fontFamily: FONTS.medium, color: COLOR.white }}>
-              Animesh Mondal
+              {user.name}
             </Text>
             <Text
               style={{
@@ -65,7 +66,7 @@ const CustomDrawer = ({ ...props }) => {
                 fontSize: 12,
               }}
             >
-              mondalarup808@gmail.com
+              {user.email}
             </Text>
           </View>
         </View>

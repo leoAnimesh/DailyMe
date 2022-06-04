@@ -55,7 +55,7 @@ const WebAppsBottomSheet = ({ reference, mode }) => {
   return (
     <RBSheet
       ref={reference}
-      height={hp(45)}
+      height={hp(38)}
       openDuration={300}
       closeDuration={300}
       customStyles={{

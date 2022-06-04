@@ -1,31 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  webApps: [
-    {
-      name: 'ABP news',
-      link: 'https://bengali.abplive.com/',
-    },
-    { name: 'Times of India', link: 'https://timesofindia.indiatimes.com/' },
-    {
-      name: 'Github',
-      link: 'https://github.com/',
-    },
-    {
-      name: 'Medium',
-      link: 'https://medium.com/',
-    },
-    {
-      name: 'Pinterest',
-      link: 'https://in.pinterest.com/',
-    },
-    { name: 'Goggle meet', link: 'https://meet.google.com/' },
-    { name: 'Zoom Meet', link: 'https://zoom.us/' },
-    {
-      name: 'JISCE',
-      link: 'https://jiscollege.ac.in/',
-    },
-  ],
+  webApps: [],
   links: [],
 };
 
