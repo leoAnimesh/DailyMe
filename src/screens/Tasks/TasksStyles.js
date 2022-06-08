@@ -14,14 +14,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   progressBarText: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: FONTS.bold,
-    lineHeight: 28,
+    lineHeight: 26,
     color: COLOR.white,
   },
   BannerImg: {
-    width: 85,
-    height: 85,
+    width: 80,
+    height: 80,
   },
   Bar: {
     width: '100%',

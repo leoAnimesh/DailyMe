@@ -28,9 +28,18 @@ export const appLinksSlice = createSlice({
       const { id } = action.payload;
       state.webApps = state.webApps.filter((app) => app.id !== id);
     },
+    resetAppsState: () => {
+      return initialState;
+    },
   },
 });
 
-export const { AddWebApps, AddLinks, getAppsandLinks, deleteLink, deleteApp } =
-  appLinksSlice.actions;
+export const {
+  AddWebApps,
+  AddLinks,
+  getAppsandLinks,
+  deleteLink,
+  deleteApp,
+  resetAppsState,
+} = appLinksSlice.actions;
 export default appLinksSlice.reducer;

@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   SignUpText: {
     fontFamily: FONTS.bold,
     fontSize: 20,
-    marginBottom: SIZES.sm,
+    marginBottom: 20,
   },
   icon: {
     marginRight: SIZES.sm,

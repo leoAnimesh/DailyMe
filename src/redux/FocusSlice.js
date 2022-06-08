@@ -17,6 +17,7 @@ export const focusSlice = createSlice({
         if (item.id === id) {
           return { ...item, currentSet: item.currentSet + 1 };
         }
+        return item;
       });
     },
     AddFocusTask: (state, action) => {
@@ -25,9 +26,22 @@ export const focusSlice = createSlice({
     getFocusTasks: (state, action) => {
       state.focusTasks = action.payload;
     },
+    resetFocusState: () => {
+      return initialState;
+    },
+    deleteFocusTask: (state, action) => {
+      const { id } = action.payload;
+      state.focusTasks = state.focusTasks.filter((focus) => focus.id !== id);
+    },
   },
 });
 
-export const { setFocusTasks, IncreaseStep, AddFocusTask, getFocusTasks } =
-  focusSlice.actions;
+export const {
+  setFocusTasks,
+  IncreaseStep,
+  AddFocusTask,
+  getFocusTasks,
+  resetFocusState,
+  deleteFocusTask,
+} = focusSlice.actions;
 export default focusSlice.reducer;

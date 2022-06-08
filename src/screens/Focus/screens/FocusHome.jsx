@@ -6,19 +6,20 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-} from "react-native";
-import React from "react";
-import { GlobalStyles } from "../../../constants/GlobalStyles";
-import { Button, FocusBottomSheet, StatusBar } from "../../../components";
-import { COLOR, FONTS, hp, SIZES } from "../../../constants/GlobalTheme";
-import { FocusLogo, TaskIcon } from "../../../../assets";
-import CategoryToogler from "../../../components/Shared/CategoryToogler";
-import { Foundation } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
-import { collection, getDocs } from "firebase/firestore";
-import { getFocusTasks } from "../../../redux/FocusSlice";
-import { db } from "../../../firebase/config";
-import { formatDate } from "../../../utils";
+} from 'react-native';
+import React from 'react';
+import { GlobalStyles } from '../../../constants/GlobalStyles';
+import { Button, FocusBottomSheet, StatusBar } from '../../../components';
+import { COLOR, FONTS, hp, SIZES } from '../../../constants/GlobalTheme';
+import { FocusLogo, TaskIcon } from '../../../../assets';
+import CategoryToogler from '../../../components/Shared/CategoryToogler';
+import { Foundation } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { getFocusTasks, deleteFocusTask } from '../../../redux/FocusSlice';
+import { db } from '../../../firebase/config';
+import { formatDate } from '../../../utils';
+import { AntDesign } from '@expo/vector-icons';
 
 const FocusHome = ({ navigation }) => {
   const focusTasks = useSelector((state) => state.focus.focusTasks);
@@ -26,45 +27,66 @@ const FocusHome = ({ navigation }) => {
   const userId = useSelector((state) => state.user.user.id);
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const options = [
-    { name: "All", length: focusTasks.length },
+    { name: 'All', length: focusTasks.length },
     {
-      name: "Pending",
-      length: focusTasks.filter((task) => task.currentSet !== task.timing.sets)
-        .length,
+      name: 'Pending',
+      length: focusTasks.filter(
+        (task) => task?.currentSet !== task?.timing?.sets
+      ).length,
     },
     {
-      name: "Completed",
-      length: focusTasks.filter((task) => task.currentSet === task.timing.sets)
-        .length,
+      name: 'Completed',
+      length: focusTasks.filter(
+        (task) => task?.currentSet === task?.timing?.sets
+      ).length,
     },
   ];
 
   const filterByCategory = () => {
-    if (selected === "All") {
+    if (selected === 'All') {
       return focusTasks;
     }
-    if (selected === "Pending") {
-      return focusTasks.filter((task) => task.currentSet !== task.timing.sets);
+    if (selected === 'Pending') {
+      return focusTasks.filter(
+        (task) => task?.currentSet !== task?.timing?.sets
+      );
     }
-    if (selected === "Completed") {
-      return focusTasks.filter((task) => task.currentSet === task.timing.sets);
+    if (selected === 'Completed') {
+      return focusTasks.filter(
+        (task) => task?.currentSet === task?.timing?.sets
+      );
     }
   };
 
   const getAllFocusTasks = async () => {
-    const colRef = collection(db, "user", userId, "focus");
+    const colRef = collection(db, 'user', userId, 'focus');
+    if (!refreshing) {
+      setLoading(true);
+    }
     getDocs(colRef)
       .then((snapshot) => {
         let tasks = [];
         snapshot.docs.forEach((doc) => {
           tasks.push({ ...doc.data(), id: doc.id });
         });
-        console.log("fetched");
+        console.log('fetched');
         dispatch(getFocusTasks(tasks));
         setLoading(false);
         setRefreshing(false);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const deleteAFocusTask = (id) => {
+    const DocRef = doc(db, 'user', userId, 'focus', id);
+    dispatch(deleteFocusTask({ id: id }));
+    deleteDoc(DocRef)
+      .then(() => {
+        console.log('link deleted');
       })
       .catch((err) => {
         console.log(err.message);
@@ -77,7 +99,9 @@ const FocusHome = ({ navigation }) => {
   };
 
   React.useEffect(() => {
-    getAllFocusTasks();
+    if (focusTasks.length === 0) {
+      getAllFocusTasks();
+    }
   }, []);
 
   const [selected, setSelected] = React.useState(options[1].name);
@@ -101,20 +125,20 @@ const FocusHome = ({ navigation }) => {
           marginHorizontal: hp(4),
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text
             style={{
-              fontSize: 20,
-              fontFamily: FONTS.bold,
+              fontSize: 18,
+              fontFamily: FONTS.semiBold,
               lineHeight: 28,
               color: COLOR.white,
             }}
           >
-            Here is the progress{"\n"}of your focus tasks
+            Here is the progress{'\n'}of your focus tasks
           </Text>
           <Image
-            style={{ width: 85, height: 85 }}
-            source={require("../../../../assets/Images/TaskBanner.png")}
+            style={{ width: 80, height: 80 }}
+            source={require('../../../../assets/Images/FocusBanner.png')}
           />
         </View>
         <View>
@@ -122,31 +146,41 @@ const FocusHome = ({ navigation }) => {
             style={{ fontSize: 16, color: COLOR.white, marginBottom: hp(1) }}
           >
             <Text style={{ fontFamily: FONTS.semiBold }}>
-              {Math.floor((options[2].length / options[0].length) * 100) !==
-                NaN && 0}
+              {focusTasks.length === 0
+                ? 0
+                : Math.floor((options[2].length / options[0].length) * 100) ===
+                  NaN
+                ? 0
+                : Math.floor(
+                    (options[2].length / options[0].length) * 100
+                  )}{' '}
               %
-            </Text>{" "}
+            </Text>{' '}
             Progress
           </Text>
           <View
             style={{
-              width: "100%",
+              width: '100%',
               height: 6,
-              backgroundColor: "#D2C4C4",
-              position: "relative",
+              backgroundColor: '#D2C4C4',
+              position: 'relative',
             }}
           >
             <View
               style={[
                 {
-                  position: "absolute",
-                  width: "35%",
+                  position: 'absolute',
+                  width: '35%',
                   height: 6,
                   backgroundColor: COLOR.white,
                   width: `${
                     Math.floor(
                       (options[2].length / options[0].length) * 100
-                    ) !== NaN && 0
+                    ) === NaN
+                      ? 0
+                      : Math.floor(
+                          (options[2].length / options[0].length) * 100
+                        )
                   }%`,
                 },
               ]}
@@ -158,9 +192,9 @@ const FocusHome = ({ navigation }) => {
       <View style={{ flex: 1, backgroundColor: COLOR.lighGray }}>
         <View
           style={{
-            justifyContent: "space-between",
-            flexDirection: "row",
-            alignItems: "center",
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            alignItems: 'center',
             paddingHorizontal: 30,
             marginTop: 25,
           }}
@@ -176,8 +210,8 @@ const FocusHome = ({ navigation }) => {
           <Button
             title="Add +"
             containerStyles={{
-              width: "auto",
-              height: "auto",
+              width: 'auto',
+              height: 'auto',
               paddingHorizontal: 15,
               paddingVertical: 5,
             }}
@@ -189,9 +223,9 @@ const FocusHome = ({ navigation }) => {
         <View
           style={{
             marginHorizontal: 30,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
           <CategoryToogler
@@ -208,17 +242,18 @@ const FocusHome = ({ navigation }) => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {loading && (
+          {loading && !refreshing && (
             <View
               style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
+                height: hp(50),
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              <ActivityIndicator color={"#000"} />
+              <ActivityIndicator color={'#000'} />
             </View>
           )}
+
           {filterByCategory().length === 0 && !loading ? (
             <Text
               style={{
@@ -227,7 +262,7 @@ const FocusHome = ({ navigation }) => {
                 marginHorizontal: 30,
               }}
             >
-              No {selected} Tasks
+              No {selected} Focus Tasks ⛔
             </Text>
           ) : (
             filterByCategory().map((item, index) => (
@@ -262,15 +297,24 @@ const FocusHome = ({ navigation }) => {
                     fontSize: 12,
                   }}
                 >
-                  Progress{" "}
-                  {Math.floor((item?.currentSet / item?.timing?.sets) * 100)} %
+                  Progress{' '}
+                  {focusTasks.length === 0
+                    ? 0
+                    : Math.floor(
+                        (item?.currentSet / item?.timing?.sets) * 100
+                      ) === NaN
+                    ? 0
+                    : Math.floor(
+                        (item?.currentSet / item?.timing?.sets) * 100
+                      )}{' '}
+                  %
                 </Text>
                 <View
                   style={{
-                    width: "97%",
+                    width: '97%',
                     height: 6,
                     backgroundColor: COLOR.gray,
-                    position: "relative",
+                    position: 'relative',
                     marginHorizontal: 5,
                     marginVertical: 10,
                   }}
@@ -278,7 +322,7 @@ const FocusHome = ({ navigation }) => {
                   <View
                     style={[
                       {
-                        position: "absolute",
+                        position: 'absolute',
                         height: 6,
                         backgroundColor: COLOR.primary,
                         width: `${Math.floor(
@@ -290,8 +334,8 @@ const FocusHome = ({ navigation }) => {
                 </View>
                 <View
                   style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
                     marginTop: 5,
                   }}
                 >
@@ -317,21 +361,37 @@ const FocusHome = ({ navigation }) => {
                       {formatDate(item?.date)}
                     </Text>
                   </View>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("focusTimer", { index: index })
-                    }
-                    style={{
-                      backgroundColor: COLOR.primary,
-                      height: 35,
-                      width: 35,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      borderRadius: 50,
-                    }}
-                  >
-                    <Foundation name="play" size={15} color="white" />
-                  </TouchableOpacity>
+                  {item.currentSet === item.timing.sets ? (
+                    <TouchableOpacity
+                      onPress={deleteAFocusTask(item?.id)}
+                      style={{
+                        backgroundColor: COLOR.primary,
+                        borderRadius: 5,
+                        padding: 8,
+                        height: 30,
+                        width: 'auto',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <AntDesign name="delete" size={15} color="white" />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('focusTimer', { index: index })
+                      }
+                      style={{
+                        backgroundColor: COLOR.primary,
+                        height: 35,
+                        width: 35,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 50,
+                      }}
+                    >
+                      <Foundation name="play" size={15} color="white" />
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             ))

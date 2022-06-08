@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image,ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Image, ActivityIndicator } from 'react-native';
 import React from 'react';
 import styles from '../Login/LoginStyles';
 import { GlobalStyles } from '../../constants/GlobalStyles';
@@ -22,36 +22,36 @@ const loginSchema = yup.object({
 });
 
 const Login = () => {
-  const [loading,setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const LoginUser = (user) => {
     setLoading(true);
     signInWithEmailAndPassword(auth, user.email, user.password)
-    .then(async(userCredential) => {
-    if(userCredential.user.uid){
-      const docRef = doc(db, "user", userCredential.user.uid);
-      try{
-        const docSnap = await getDoc(docRef);
-        if(docSnap.exists()){
-          dispatch(setAuth({id:docSnap.id,...docSnap.data()}))
-          setLoading(false);
-        }else{
-          navigation.navigate('SignUp');
-          setLoading(false);
+      .then(async (userCredential) => {
+        if (userCredential.user.uid) {
+          const docRef = doc(db, 'user', userCredential.user.uid);
+          try {
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              dispatch(setAuth({ id: docSnap.id, ...docSnap.data() }));
+              setLoading(false);
+            } else {
+              navigation.navigate('SignUp');
+              setLoading(false);
+            }
+          } catch (err) {
+            console.log(err.message);
+            setLoading(false);
+          }
         }
-      }catch(err){
-        console.log(err.message);
+      })
+      .catch((error) => {
+        console.log(error.message);
         setLoading(false);
-      }
-    }
-  })
-  .catch((error) => {
-    console.log(error.message);
-    setLoading(false);
-  });
-  }
+      });
+  };
 
   return (
     <ScrollView>
@@ -76,7 +76,7 @@ const Login = () => {
           initialValues={{ email: '', password: '' }}
           validationSchema={loginSchema}
           onSubmit={(values) => {
-            LoginUser(values)
+            LoginUser(values);
           }}
         >
           {(props) => (
@@ -112,18 +112,15 @@ const Login = () => {
               />
               <Text style={styles.error}>{props.errors.password}</Text>
               <View style={styles.footer}>
-                <Button title={loading ? <ActivityIndicator color="#fff" /> : 'Login'} onPress={props.handleSubmit} />
+                <Button
+                  title={loading ? <ActivityIndicator color="#fff" /> : 'Login'}
+                  onPress={props.handleSubmit}
+                />
                 <View style={styles.divider}>
                   <View style={styles.firstDivider}></View>
                   <Text>OR</Text>
                   <View style={styles.secondDivider}></View>
                 </View>
-                <Button
-                  title="Continue with Google"
-                  containerStyles={{ backgroundColor: COLOR.gray }}
-                  textStyles={{ color: COLOR.black }}
-                  onPress={() => navigation.navigate('Home')}
-                />
                 <Text style={styles.bottomText}>
                   New to DailyMe. ?{' '}
                   <Text

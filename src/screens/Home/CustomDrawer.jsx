@@ -10,12 +10,24 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/config';
 import { clearUser } from '../../redux/userSlice';
 import { AntDesign } from '@expo/vector-icons';
+import { resetAppsState } from '../../redux/appLinksSlice';
+import { resetFocusState } from '../../redux/FocusSlice';
+import { resetTasksState } from '../../redux/tasksSlice';
 
 const CustomDrawer = ({ ...props }) => {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const handleSignOut = () => {
     signOut(auth)
+      .then(() => {
+        dispatch(resetTasksState());
+      })
+      .then(() => {
+        dispatch(resetAppsState());
+      })
+      .then(() => {
+        dispatch(resetFocusState());
+      })
       .then(() => {
         dispatch(clearUser());
       })

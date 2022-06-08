@@ -18,7 +18,6 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
-  blacklist: ['tasks', 'apps', 'focus'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
