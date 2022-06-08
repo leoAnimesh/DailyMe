@@ -5,31 +5,32 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
-} from 'react-native';
-import React from 'react';
-import { GlobalStyles } from '../../constants/GlobalStyles';
+} from "react-native";
+import React from "react";
+import { GlobalStyles } from "../../constants/GlobalStyles";
 import {
   StatusBar,
   WebAppsBottomSheet,
   WebViewBottomSheet,
-} from '../../components';
-import { COLOR, FONTS, SIZES, hp, wp } from '../../constants/GlobalTheme';
-import { AppsLogo } from '../../../assets';
-import { useDispatch, useSelector } from 'react-redux';
-import * as expoBrowser from 'expo-web-browser';
-import { collection, deleteDoc, getDocs, doc } from 'firebase/firestore';
+} from "../../components";
+import { COLOR, FONTS, SIZES, hp, wp } from "../../constants/GlobalTheme";
+import { AppsLogo } from "../../../assets";
+import { useDispatch, useSelector } from "react-redux";
+import * as expoBrowser from "expo-web-browser";
+import { collection, deleteDoc, getDocs, doc } from "firebase/firestore";
 import {
   deleteApp,
   deleteLink,
   getAppsandLinks,
-} from '../../redux/appLinksSlice';
-import { db } from '../../firebase/config';
+} from "../../redux/appLinksSlice";
+import { db } from "../../firebase/config";
+import { AntDesign } from "@expo/vector-icons";
 
 const WebApps = ({ navigation }) => {
   const webViewBottomSheetRef = React.useRef(null);
   const addAppsRef = React.useRef(null);
-  const [mode, setMode] = React.useState('apps');
-  const [activeLink, setActiveLink] = React.useState('');
+  const [mode, setMode] = React.useState("apps");
+  const [activeLink, setActiveLink] = React.useState("");
   const webApps = useSelector((state) => state.apps.webApps);
   const links = useSelector((state) => state.apps.links);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -38,27 +39,27 @@ const WebApps = ({ navigation }) => {
   const [loading, setLoading] = React.useState(true);
   const DefaultwebApps = [
     {
-      name: 'ABP news',
-      link: 'https://bengali.abplive.com/',
+      name: "ABP news",
+      link: "https://bengali.abplive.com/",
     },
-    { name: 'Times of India', link: 'https://timesofindia.indiatimes.com/' },
+    { name: "Times of India", link: "https://timesofindia.indiatimes.com/" },
     {
-      name: 'Github',
-      link: 'https://github.com/',
-    },
-    {
-      name: 'Medium',
-      link: 'https://medium.com/',
+      name: "Github",
+      link: "https://github.com/",
     },
     {
-      name: 'Pinterest',
-      link: 'https://in.pinterest.com/',
+      name: "Medium",
+      link: "https://medium.com/",
     },
-    { name: 'Goggle meet', link: 'https://meet.google.com/' },
-    { name: 'Zoom Meet', link: 'https://zoom.us/' },
     {
-      name: 'JISCE',
-      link: 'https://jiscollege.ac.in/',
+      name: "Pinterest",
+      link: "https://in.pinterest.com/",
+    },
+    { name: "Goggle meet", link: "https://meet.google.com/" },
+    { name: "Zoom Meet", link: "https://zoom.us/" },
+    {
+      name: "JISCE",
+      link: "https://jiscollege.ac.in/",
     },
   ];
 
@@ -66,11 +67,11 @@ const WebApps = ({ navigation }) => {
     let apps = [];
     let links = [];
     try {
-      const appData = await getDocs(collection(db, 'user', userId, 'apps'));
+      const appData = await getDocs(collection(db, "user", userId, "apps"));
       appData.docs.forEach((doc) => {
         apps.push({ ...doc.data(), id: doc.id });
       });
-      const linkData = await getDocs(collection(db, 'user', userId, 'links'));
+      const linkData = await getDocs(collection(db, "user", userId, "links"));
       linkData.docs.forEach((doc) => {
         links.push({ ...doc.data(), id: doc.id });
       });
@@ -89,9 +90,9 @@ const WebApps = ({ navigation }) => {
 
   const deleteLinks = (id) => {
     dispatch(deleteLink({ id: id }));
-    deleteDoc(doc(db, 'user', userId, 'links', id))
+    deleteDoc(doc(db, "user", userId, "links", id))
       .then(() => {
-        console.log('link deleted');
+        console.log("link deleted");
       })
       .catch((err) => {
         console.log(err.message);
@@ -100,9 +101,9 @@ const WebApps = ({ navigation }) => {
 
   const deleteApps = (id) => {
     dispatch(deleteApp({ id: id }));
-    deleteDoc(doc(db, 'user', userId, 'apps', id))
+    deleteDoc(doc(db, "user", userId, "apps", id))
       .then(() => {
-        console.log('app deleted');
+        console.log("app deleted");
       })
       .catch((err) => {
         console.log(err.message);
@@ -141,11 +142,11 @@ const WebApps = ({ navigation }) => {
         >
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              flexDirection: "row",
+              justifyContent: "space-between",
             }}
           >
-            <View style={{ width: '68%' }}>
+            <View style={{ width: "68%" }}>
               <Text
                 style={{
                   fontSize: 16,
@@ -156,7 +157,7 @@ const WebApps = ({ navigation }) => {
               >
                 Add your favorite web apps & important links
               </Text>
-              <View style={{ flexDirection: 'row', marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginTop: 10 }}>
                 <Text
                   style={{
                     backgroundColor: COLOR.lighGray,
@@ -168,7 +169,7 @@ const WebApps = ({ navigation }) => {
                     fontFamily: FONTS.regular,
                   }}
                 >
-                  Apps{' '}
+                  Apps{" "}
                   <Text
                     style={{ color: COLOR.primary, fontFamily: FONTS.bold }}
                   >
@@ -185,7 +186,7 @@ const WebApps = ({ navigation }) => {
                     borderRadius: 5,
                   }}
                 >
-                  Links{' '}
+                  Links{" "}
                   <Text
                     style={{ color: COLOR.primary, fontFamily: FONTS.bold }}
                   >
@@ -196,7 +197,7 @@ const WebApps = ({ navigation }) => {
             </View>
             <Image
               style={{ width: 85, height: 85 }}
-              source={require('../../../assets/Images/TaskBanner.png')}
+              source={require("../../../assets/Images/TaskBanner.png")}
             />
           </View>
         </View>
@@ -205,8 +206,8 @@ const WebApps = ({ navigation }) => {
           style={{
             marginBottom: 10,
             marginHorizontal: 30,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            flexDirection: "row",
+            justifyContent: "space-between",
           }}
         >
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 18 }}>
@@ -214,13 +215,13 @@ const WebApps = ({ navigation }) => {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              setMode('apps');
+              setMode("apps");
               addAppsRef.current.open();
             }}
             style={{
               backgroundColor: COLOR.primary,
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               paddingVertical: 5,
               paddingHorizontal: 15,
               borderRadius: 5,
@@ -233,9 +234,8 @@ const WebApps = ({ navigation }) => {
         <View
           style={{
             marginTop: hp(2),
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
+            flexDirection: "row",
+            flexWrap: "wrap",
             marginHorizontal: 25,
           }}
         >
@@ -243,8 +243,7 @@ const WebApps = ({ navigation }) => {
             <TouchableOpacity
               key={index}
               onPress={() => {
-                setActiveLink(item.link);
-                webViewBottomSheetRef.current.open();
+                expoBrowser.openBrowserAsync(item.link);
               }}
               onLongPress={() => {
                 deleteApps(item.id);
@@ -257,16 +256,17 @@ const WebApps = ({ navigation }) => {
                   borderColor: COLOR.gray,
                   width: wp(20),
                   height: hp(8),
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                  marginRight: 10,
                 },
               ]}
             >
               <View
                 style={{
                   borderRadius: 10,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <Image
@@ -285,7 +285,7 @@ const WebApps = ({ navigation }) => {
                   fontFamily: FONTS.regular,
                   fontSize: 10,
                   marginTop: 5,
-                  textAlign: 'center',
+                  textAlign: "center",
                 }}
               >
                 {item.name}
@@ -304,9 +304,9 @@ const WebApps = ({ navigation }) => {
           <View
             style={{
               marginTop: hp(2),
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
               marginVertical: 25,
             }}
           >
@@ -320,13 +320,13 @@ const WebApps = ({ navigation }) => {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                setMode('links');
+                setMode("links");
                 addAppsRef.current.open();
               }}
               style={{
                 backgroundColor: COLOR.primary,
-                justifyContent: 'center',
-                alignItems: 'center',
+                justifyContent: "center",
+                alignItems: "center",
                 paddingVertical: 5,
                 paddingHorizontal: 15,
                 borderRadius: 5,
@@ -346,9 +346,9 @@ const WebApps = ({ navigation }) => {
                 onPress={() => expoBrowser.openBrowserAsync(link.link)}
                 style={[
                   {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 15,
                     paddingVertical: 15,
                     backgroundColor: COLOR.white,
@@ -358,9 +358,9 @@ const WebApps = ({ navigation }) => {
                   GlobalStyles.shadow,
                 ]}
               >
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: "row" }}>
                   <Image
-                    source={require('../../../assets/Images/link.png')}
+                    source={require("../../../assets/Images/link.png")}
                     style={{ width: 40, height: 40, marginRight: 10 }}
                   />
                   <View>
@@ -375,7 +375,7 @@ const WebApps = ({ navigation }) => {
                       }}
                     >
                       {link?.link.length > 30
-                        ? link.link.substring(0, 25) + '...'
+                        ? link.link.substring(0, 25) + "..."
                         : link.link}
                     </Text>
                   </View>
@@ -384,20 +384,11 @@ const WebApps = ({ navigation }) => {
                   onPress={() => deleteLinks(link.id)}
                   style={{
                     backgroundColor: COLOR.primary,
-                    paddingVertical: 5,
-                    paddingHorizontal: 15,
                     borderRadius: 5,
+                    padding: 8,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: COLOR.white,
-                      fontSize: 12,
-                      fontFamily: FONTS.semiBold,
-                    }}
-                  >
-                    Delete
-                  </Text>
+                  <AntDesign name="delete" size={15} color="white" />
                 </TouchableOpacity>
               </TouchableOpacity>
             ))}

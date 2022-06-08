@@ -6,68 +6,71 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-} from 'react-native';
-import React from 'react';
-import styles from './TasksStyles';
-import { GlobalStyles } from '../../constants/GlobalStyles';
-import { TaskIcon } from '../../../assets';
-import { COLOR, FONTS, hp } from '../../constants/GlobalTheme';
+} from "react-native";
+import React from "react";
+import styles from "./TasksStyles";
+import { GlobalStyles } from "../../constants/GlobalStyles";
+import { TaskIcon } from "../../../assets";
+import { COLOR, FONTS, hp } from "../../constants/GlobalTheme";
 import {
   CategoryList,
   StatusBar,
   TaskBottomSheet,
   TaskCard,
-} from '../../components';
-import { useDispatch, useSelector } from 'react-redux';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { getTasks } from '../../redux/tasksSlice';
+} from "../../components";
+import { useDispatch, useSelector } from "react-redux";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { getTasks } from "../../redux/tasksSlice";
 
 const Tasks = ({ navigation }) => {
   const TaskBottomSheetRef = React.useRef(null);
   const userId = useSelector((state) => state.user.user.id);
   const allTasks = useSelector((state) => state.tasks.tasks);
-  const [mode, setMode] = React.useState('add');
+  const [mode, setMode] = React.useState("add");
   const [currentTaskIndex, setCurrentTaskIndex] = React.useState(0);
 
   const openEditSheet = (index) => {
-    setMode('edit');
+    setMode("edit");
     setCurrentTaskIndex(index);
     TaskBottomSheetRef.current.open();
   };
 
   const openViewSheet = (index) => {
-    setMode('view');
+    setMode("view");
     setCurrentTaskIndex(index);
     TaskBottomSheetRef.current.open();
   };
 
   const options = [
-    { name: 'All', length: allTasks.length },
+    { name: "All", length: allTasks.length },
     {
-      name: 'Pending',
+      name: "Pending",
       length: allTasks.filter((item) => item.completed === false).length,
     },
     {
-      name: 'Completed',
+      name: "Completed",
       length: allTasks.filter((item) => item.completed === true).length,
     },
   ];
 
   const [selected, setSelected] = React.useState(options[1].name);
   const [refreshing, setRefreshing] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const dispatch = useDispatch();
 
   const getAllTasks = () => {
-    const colRef = collection(db, 'user', userId, 'tasks');
+    if (!refreshing) {
+      setLoading(true);
+    }
+    const colRef = collection(db, "user", userId, "tasks");
     getDocs(colRef)
       .then((snapshot) => {
         let tasks = [];
         snapshot.docs.forEach((doc) => {
           tasks.push({ ...doc.data(), id: doc.id });
         });
-        console.log('fetched');
+        console.log("fetched");
         dispatch(getTasks(tasks));
         setLoading(false);
         setRefreshing(false);
@@ -83,13 +86,13 @@ const Tasks = ({ navigation }) => {
   };
 
   const filterByCategory = () => {
-    if (selected === 'All') {
+    if (selected === "All") {
       return allTasks;
     }
-    if (selected === 'Pending') {
+    if (selected === "Pending") {
       return allTasks.filter((task) => task.completed === false);
     }
-    if (selected === 'Completed') {
+    if (selected === "Completed") {
       return allTasks.filter((task) => task.completed === true);
     }
   };
@@ -114,18 +117,18 @@ const Tasks = ({ navigation }) => {
       <View style={[styles.progressBar]}>
         <View style={styles.progressBarTop}>
           <Text style={styles.progressBarText}>
-            Your Tasks are {'\n'} Going Great
+            Your Tasks are {"\n"} Going Great
           </Text>
           <Image
             style={styles.BannerImg}
-            source={require('../../../assets/Images/TaskBanner.png')}
+            source={require("../../../assets/Images/TaskBanner.png")}
           />
         </View>
         <View>
           <Text style={styles.progressText}>
             <Text style={{ fontFamily: FONTS.semiBold }}>
               {Math.floor((options[2].length / options[0].length) * 100)} %
-            </Text>{' '}
+            </Text>{" "}
             progress
           </Text>
           <View style={styles.Bar}>
@@ -147,9 +150,9 @@ const Tasks = ({ navigation }) => {
       <View style={styles.TasksContainer}>
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <Text style={{ fontFamily: FONTS.medium, fontSize: 20 }}>
@@ -158,14 +161,14 @@ const Tasks = ({ navigation }) => {
           <TouchableOpacity
             style={{
               backgroundColor: COLOR.primary,
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               paddingVertical: 5,
               paddingHorizontal: 15,
               borderRadius: 5,
             }}
             onPress={() => {
-              setMode('add');
+              setMode("add");
               TaskBottomSheetRef.current.open();
             }}
           >
@@ -179,9 +182,9 @@ const Tasks = ({ navigation }) => {
         />
         {loading && (
           <View
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            <ActivityIndicator color={'#000'} />
+            <ActivityIndicator color={"#000"} />
           </View>
         )}
         <ScrollView
